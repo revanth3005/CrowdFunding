@@ -177,12 +177,12 @@ const CreateCampaign = () => {
     }),
     onSubmit: async (values) => {
       console.log("Formik values", values);
-
+      const w = web3.utils.toWei(values.minPrice);
       //bt state
       setBtState(true);
       //   sending transaction
       write({
-        args: [values.name, values.minPrice],
+        args: [values.name, w],
         from: address,
       });
     },
@@ -248,7 +248,7 @@ const CreateCampaign = () => {
                     required
                     fullWidth
                     id="minPrice"
-                    label="Min Contribution Price"
+                    label="Min Contribution Price MATIC"
                     value={createFormik.values.minPrice}
                     onChange={createFormik.handleChange}
                     helperText={createFormik.errors.minPrice}

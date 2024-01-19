@@ -63,7 +63,6 @@ function Header() {
         switchNetwork?.(5);
       }
 
-      console.log(address);
     },
 
     onDisconnect() {
@@ -107,7 +106,8 @@ function Header() {
     <AppBar
       position="sticky"
       sx={{
-        backgroundColor: "#092635",
+        backgroundColor: "brown",
+        // backgroundColor: "#092635",
         height: 100,
         display: "flex",
         justifyContent: "center",
@@ -116,7 +116,7 @@ function Header() {
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
-            variant="h6"
+            variant="h5"
             noWrap
             component="a"
             sx={{
@@ -236,7 +236,7 @@ function Header() {
                 String(address).substring(38)
               : "Connect wallet"}
           </Button>
-          <Box sx={{ flexGrow: 0 }}>
+          {/* <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
@@ -264,7 +264,7 @@ function Header() {
                 </MenuItem>
               ))}
             </Menu>
-          </Box>
+          </Box> */}
         </Toolbar>
       </Container>
     </AppBar>

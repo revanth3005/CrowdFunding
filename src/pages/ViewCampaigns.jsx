@@ -63,8 +63,9 @@ const ViewCampaigns = () => {
       <Box
         sx={{
           minHeight: "84vh",
-          color: "black",
-          backgroundImage: `url(${bg})`,
+          color: "white",
+          // backgroundImage: `url(${bg})`,
+          backgroundColor: "black",
         }}
       >
         <Container
@@ -103,19 +104,22 @@ const ViewCampaigns = () => {
                         style={{ textDecoration: "none" }}
                       >
                         <Grid item>
-                          <Card sx={{ maxWidth: 345 }}>
+                          <Card sx={{ maxWidth: 345, minWidth:345 }}>
                             <CardActionArea>
                               <CardMedia
                                 component="img"
-                                height="180"
+                                height="200"
                                 image={im}
                                 alt="green iguana"
                               />
                               <CardContent
-                                sx={{
-                                  backgroundImage: `url(${bg})`,
-                                  color: "white",
-                                }}
+                                sx={
+                                  {
+                                    backgroundImage: `url(${bg})`,
+                                    color: "white",
+                                    // backgroundColor:'bla'
+                                  }
+                                }
                               >
                                 <Box
                                   sx={{
@@ -171,24 +175,26 @@ const ViewCampaigns = () => {
                                       </Stack>
                                     </Stack>
                                   </Stack>
-                                  <Divider
+                                  {/* <Divider
                                     sx={{
                                       color: "white",
                                       border: "1px solid gray",
                                       mb: 1,
                                     }}
-                                  />
-                                  <Typography
+                                  /> */}
+                                  {/* <Typography
                                     variant="body2"
                                     color="text.secondary"
-                                    sx={{
-                                      color: "white",
-                                    }}
+                                    sx={
+                                      {
+                                        color: "white",
+                                      }
+                                    }
                                   >
                                     Lizards are a widespread group of squamate
                                     reptiles, with over 6,000 species, ranging
                                     across all continents except Antarctica
-                                  </Typography>
+                                  </Typography> */}
                                 </Box>
                               </CardContent>
                             </CardActionArea>

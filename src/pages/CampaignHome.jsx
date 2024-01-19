@@ -2,11 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Box, Container, Divider, Stack, Typography } from "@mui/material";
 import web3 from "../configurations/alchemy/alchemy-config";
 import CF_Factory_ABI from "../contract_abis/CF_Factory_ABI.json";
+import CF_ABI from "../contract_abis/CF_ABI.json";
 import jsonData from "../config.json";
 import bg from "../assets/home.svg";
+import bg1 from "../assets/view.svg";
 import { NavLink } from "react-router-dom";
 const CampaignHome = () => {
-  const [campaigns, setCampaigns] = useState();
+  const [campaigns, setCampaigns] = useState(null);
+  const [contributors, setContributors] = useState(null);
+  const [fundsRaised, setFundsRaised] = useState(null);
   const types = [
     {
       id: 1,
@@ -21,34 +25,89 @@ const CampaignHome = () => {
   ];
   useEffect(() => {
     const fetchData = async () => {
-      const i = new web3.eth.Contract(
-        CF_Factory_ABI,
-        jsonData.CF_Factory_Contract
-      );
+      try {
+        const CF_Factory = new web3.eth.Contract(
+          CF_Factory_ABI,
+          jsonData.CF_Factory_Contract
+        );
 
-      const count = await i.methods.cf_Count().call();
-      console.log("array data", count);
-      setCampaigns(count);
+        const count = await CF_Factory.methods.cf_Count().call();
+        setCampaigns(count);
+
+        let ar = [];
+        let r = [];
+        const getCFDeployedArray = await CF_Factory.methods
+          .getCFDeployedArray()
+          .call();
+        for (let i = 0; i < count; i++) {
+          r.push(i);
+        }
+        let contributorsCount = 0;
+        let fundsRaise = 0;
+        for await (let item of getCFDeployedArray) {
+          const CF = new web3.eth.Contract(CF_ABI, item);
+          const approversCount = await CF.methods.approversCount().call();
+
+          contributorsCount += +approversCount;
+          const minContributionAmount = await CF.methods
+            .minimumContributorAmout()
+            .call();
+
+          if (approversCount > 0) {
+            //creating an dummy array for loop
+            let approvalCountArray = [];
+            for (let v = 0; v < +approversCount; v++) {
+              approvalCountArray.push(v + 1);
+            }
+            console.log("approvalCountArray", approvalCountArray);
+            for await (let counter of approvalCountArray) {
+              console.log("-------------", counter, approversCount);
+              fundsRaise = fundsRaise + +minContributionAmount;
+              console.log("-------------", counter, fundsRaise);
+            }
+          }
+          console.log(
+            "approvers count",
+            item,
+            approversCount,
+            minContributionAmount,
+            fundsRaise
+          );
+        }
+        setFundsRaised(web3.utils.fromWei(String(fundsRaise)));
+        setContributors(contributorsCount);
+        console.log("fundsRaise", typeof String(fundsRaise));
+      } catch (error) {
+        console.log(error);
+      }
     };
     fetchData();
   }, []);
+
   return (
     <Box
       sx={{
         minHeight: "84vh",
         color: "white",
         backgroundImage: `url(${bg})`,
+        //  backdropFilter: "blur(80px)",
+        // backgroundColor: "black",
       }}
     >
       <Container
         sx={{
           width: "100%",
           minHeight: "84vh",
-          backdropFilter: "blur(5px)",
+          // backdropFilter: "blur(80px)",
+          // background: "rgba(0, 0, 0, 0.5 )",
+          boxShadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",
+          backdropFilter: "blur( 10px )",
+          // -webkit-backdropFilter: blur( 3px );
+          // border-radius: 10px;
         }}
       >
         <Typography variant="h5" textAlign={"center"} p={2} fontWeight={600}>
-          Welcome to the Platform for Crowdfunding.
+          Welcome to the Crowdfunding Platform.
         </Typography>
         <Divider
           sx={{
@@ -60,7 +119,7 @@ const CampaignHome = () => {
         <Stack display={"flex"} justifyContent={"center"} alignItems={"center"}>
           <Box
             sx={{
-              width: 200,
+              width: 1200,
               height: 100,
               display: "flex",
               justifyContent: "center",
@@ -69,10 +128,64 @@ const CampaignHome = () => {
               borderRadius: 1,
             }}
           >
-            <Typography variant="h6" fontWeight={400}>
-              Created Campaigns
-            </Typography>
-            <Typography>{campaigns}</Typography>
+            <Stack
+              justifyContent={"center"}
+              direction={"row"}
+              alignItems={"center"}
+              gap={2}
+            >
+              <Box
+                sx={{
+                  border: "1px solid gray",
+                  p: 1,
+                  width: 250,
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6" fontWeight={400}>
+                  Total Campaigns
+                </Typography>
+                <Typography textAlign={"center"}>{campaigns}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  border: "1px solid gray",
+                  p: 1,
+                  width: 250,
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6" fontWeight={400}>
+                  Total Contributors
+                </Typography>
+                <Typography textAlign={"center"}>{contributors}</Typography>
+              </Box>
+              <Box
+                sx={{
+                  border: "1px solid gray",
+                  p: 1,
+                  width: 250,
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6" fontWeight={400}>
+                  Total Contributions
+                </Typography>
+                <Typography textAlign={"center"}>{fundsRaised} ETH</Typography>
+              </Box>
+            </Stack>
           </Box>
           <Divider
             sx={{
@@ -100,7 +213,7 @@ const CampaignHome = () => {
                 <Box
                   sx={{
                     border: "1px solid gray",
-                    width: 300,
+                    width: 320,
                     height: 150,
                     display: "flex",
                     justifyContent: "center",
@@ -110,20 +223,11 @@ const CampaignHome = () => {
                     "&:hover": {
                       cursor: "pointer",
                     },
-                    // backgroundColor: "#9EC8B9",
-                    backgroundImage:
-                      index % 2 === 0
-                        ? "radial-gradient( circle 337px at 0% 2.1%,  rgba(0,226,192,1) 0.3%, rgba(149,0,248,1) 100% )"
-                        : "linear-gradient( 180.4deg,  rgba(188,120,236,1) -2.2%, rgba(29,133,163,1) 83.5% )",
-
-                    borderColor: "#092635",
+                    //backgroundColor: "brown",
+                    //borderColor: "brown",
                   }}
                 >
-                  <Typography
-                    fontWeight={500}
-                    textAlign={"center"}
-                    color={"white"}
-                  >
+                  <Typography textAlign={"center"} variant="h5" color={"white"}>
                     {item.name}
                   </Typography>
                 </Box>
